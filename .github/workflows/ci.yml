@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Rebuild the Studio layout the suite expects: the plugin at
+      # wp-content/plugins/mcp-server and WordPress core at the workspace root.
+      - name: Checkout plugin
+        uses: actions/checkout@v4
+        with:
+          path: wp-content/plugins/mcp-server
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+      - name: Download WordPress core
+        run: |
+          curl -sL https://wordpress.org/latest.tar.gz -o wordpress.tar.gz
+          tar --strip-components=1 -xzf wordpress.tar.gz
+      - name: Install SQLite database integration
+        run: |
+          curl -sL https://downloads.wordpress.org/plugin/sqlite-database-integration.2.2.23.zip -o sqlite.zip
+          unzip -q sqlite.zip -d wp-content/plugins
+          cp wp-content/plugins/sqlite-database-integration/db.copy wp-content/db.php
+      - name: Install MCP Adapter
+        run: |
+          curl -sL https://github.com/WordPress/mcp-adapter/releases/download/v0.6.1/mcp-adapter.zip -o mcp-adapter.zip
+          unzip -q mcp-adapter.zip -d wp-content/plugins
+      - name: Install Composer dependencies
+        working-directory: wp-content/plugins/mcp-server
+        run: composer install --no-interaction --prefer-dist
+      - name: Run tests
+        working-directory: wp-content/plugins/mcp-server
+        run: composer test

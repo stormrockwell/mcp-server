@@ -1,0 +1,20 @@
+# Left out of the release zip. Patterns are rsync style, read by bin/package.sh.
+/.git
+/.github
+/.gitignore
+/.distignore
+/.claude
+/.superpowers
+/.mcp.json
+/.phpunit.result.cache
+/.DS_Store
+/dist
+/tests
+/docs
+/bin
+/composer.lock
+/phpcs.xml.dist
+/phpunit.xml.dist
+/PROMPT.md
+/CLAUDE.md
+/AGENTS.md
