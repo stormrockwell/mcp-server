@@ -125,6 +125,6 @@ add_filter( 'mcp_server_allowed_settings', fn( $names ) => array_merge( $names, 
 composer install
 composer lint       # WordPress Coding Standards
 composer lint:fix
-composer test       # Needs the plugin inside a WordPress Studio site, next to the MCP Adapter
+composer test       # Currently designed to work on WordPress Studio. Requires the SQLite drop-in and MCP Adapter plugin.
 composer package    # Builds dist/mcp-server.zip
 ```
