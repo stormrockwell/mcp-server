@@ -19,8 +19,8 @@ class SettingSave extends Ability {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function name(): string {
-		return 'mcp-server/setting-save';
+	protected function slug(): string {
+		return 'setting-save';
 	}
 
 	/**
@@ -51,7 +51,7 @@ class SettingSave extends Ability {
 			'properties' => array(
 				'settings' => array(
 					'type'                 => 'object',
-					'description'          => 'Setting values keyed by name.',
+					'description'          => __( 'Setting values keyed by name.', 'mcp-server' ),
 					'minProperties'        => 1,
 					'additionalProperties' => array( 'type' => array( 'string', 'integer' ) ),
 				),
@@ -68,7 +68,7 @@ class SettingSave extends Ability {
 			'properties' => array(
 				'settings' => array(
 					'type'                 => 'object',
-					'description'          => 'The saved values, read back from the database.',
+					'description'          => __( 'The saved values, read back from the database.', 'mcp-server' ),
 					'additionalProperties' => true,
 				),
 			),

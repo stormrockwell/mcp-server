@@ -20,8 +20,8 @@ class MenuSave extends Ability {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function name(): string {
-		return 'mcp-server/menu-save';
+	protected function slug(): string {
+		return 'menu-save';
 	}
 
 	/**
@@ -47,15 +47,15 @@ class MenuSave extends Ability {
 			'properties' => array(
 				'id'    => array(
 					'type'        => 'integer',
-					'description' => 'Menu to update. Leave out to create.',
+					'description' => __( 'Menu to update. Leave out to create.', 'mcp-server' ),
 				),
 				'name'  => array(
 					'type'        => 'string',
-					'description' => 'Required when creating.',
+					'description' => __( 'Required when creating.', 'mcp-server' ),
 				),
 				'items' => array(
 					'type'        => 'array',
-					'description' => 'The full list of links, in order. Replaces the current items.',
+					'description' => __( 'The full list of links, in order. Replaces the current items.', 'mcp-server' ),
 					'items'       => array(
 						'type'       => 'object',
 						'required'   => array( 'title', 'url' ),

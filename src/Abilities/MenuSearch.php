@@ -19,8 +19,8 @@ class MenuSearch extends Ability {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function name(): string {
-		return 'mcp-server/menu-search';
+	protected function slug(): string {
+		return 'menu-search';
 	}
 
 	/**
@@ -46,11 +46,11 @@ class MenuSearch extends Ability {
 			'properties' => array(
 				'id'     => array(
 					'type'        => 'integer',
-					'description' => 'Return only the menu with this ID.',
+					'description' => __( 'Return only the menu with this ID.', 'mcp-server' ),
 				),
 				'search' => array(
 					'type'        => 'string',
-					'description' => 'Text to look for in the menu name.',
+					'description' => __( 'Text to look for in the menu name.', 'mcp-server' ),
 				),
 			),
 		);

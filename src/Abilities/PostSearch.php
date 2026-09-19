@@ -21,8 +21,8 @@ class PostSearch extends Ability {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function name(): string {
-		return 'mcp-server/post-search';
+	protected function slug(): string {
+		return 'post-search';
 	}
 
 	/**
@@ -48,26 +48,26 @@ class PostSearch extends Ability {
 			'properties' => array(
 				'id'        => array(
 					'type'        => 'integer',
-					'description' => 'Return only the post with this ID. The defaults still filter: also pass "post_type" and "status" unless it is a published post.',
+					'description' => __( 'Return only the post with this ID. The defaults still filter: also pass "post_type" and "status" unless it is a published post.', 'mcp-server' ),
 				),
 				'search'    => array(
 					'type'        => 'string',
-					'description' => 'Words to look for in the title and content.',
+					'description' => __( 'Words to look for in the title and content.', 'mcp-server' ),
 				),
 				'status'    => array(
 					'type'        => 'string',
 					'enum'        => array( 'publish', 'draft', 'pending', 'private', 'future', 'any' ),
-					'description' => 'Defaults to "publish".',
+					'description' => __( 'Defaults to "publish".', 'mcp-server' ),
 				),
 				'post_type' => array(
 					'type'        => 'string',
-					'description' => 'A public post type such as "post" or "page". Defaults to "post".',
+					'description' => __( 'A public post type such as "post" or "page". Defaults to "post".', 'mcp-server' ),
 				),
 				'per_page'  => array(
 					'type'        => 'integer',
 					'minimum'     => 1,
 					'maximum'     => 50,
-					'description' => 'Defaults to 10.',
+					'description' => __( 'Defaults to 10.', 'mcp-server' ),
 				),
 			),
 		);

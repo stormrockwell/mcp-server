@@ -56,14 +56,22 @@ class DraftPost extends Prompt {
 	 */
 	public function messages( array $args ): array {
 		// A pattern fixes the layout, so every post drafted with it looks the same. Without one the model picks its own.
-		$layout = empty( $args['pattern'] )
-			? 'Give it an introduction, three to five sections with headings, and a conclusion.'
-			: sprintf( 'Fetch the slots of the pattern "%1$s" with pattern-search and pass it to post-save as "sections". %2$s', $args['pattern'], self::SLOTS );
+		if ( empty( $args['pattern'] ) ) {
+			$layout = __( 'Give it an introduction, three to five sections with headings, and a conclusion.', 'mcp-server' );
+		} else {
+			$layout = sprintf(
+				/* translators: 1: pattern name, 2: instructions for filling the pattern. Keep the tool names pattern-search and post-save, and "sections", as they are. */
+				__( 'Fetch the slots of the pattern "%1$s" with pattern-search and pass it to post-save as "sections". %2$s', 'mcp-server' ),
+				$args['pattern'],
+				$this->slots()
+			);
+		}
 
 		$text = sprintf(
-			'Write a blog post about "%1$s" in a %2$s tone. %3$s Save it with post-save as a draft.',
+			/* translators: 1: topic, 2: writing tone, 3: layout instructions. Keep the tool name post-save as it is. */
+			__( 'Write a blog post about "%1$s" in a %2$s tone. %3$s Save it with post-save as a draft.', 'mcp-server' ),
 			$args['topic'] ?? '',
-			$args['tone'] ?? 'friendly',
+			$args['tone'] ?? __( 'friendly', 'mcp-server' ),
 			$layout
 		);
 

@@ -28,6 +28,9 @@ class Plugin {
 		add_action( 'wp_abilities_api_init', array( $this, 'register_abilities' ) );
 		add_action( 'mcp_adapter_init', array( $this, 'register_server' ) );
 		add_action( 'admin_notices', array( $this, 'adapter_notice' ) );
+
+		// Disable the default MCP Adapter server.
+		add_filter( 'mcp_adapter_create_default_server', '__return_false' );
 	}
 
 	/**

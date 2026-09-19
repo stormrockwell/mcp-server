@@ -21,7 +21,9 @@ abstract class Prompt {
 	 *
 	 * Models make up URLs that look real and do not load, and a sample image beats a broken one.
 	 */
-	protected const SLOTS = 'Replace every sample text. Replace a sample image or link only with a URL the user gave you or one you have fetched, otherwise pass null, and let alt text follow its image.';
+	protected function slots(): string {
+		return __( 'Replace every sample text. Replace a sample image or link only with a URL the user gave you or one you have fetched, otherwise pass null, and let alt text follow its image.', 'mcp-server' );
+	}
 
 	/**
 	 * Builds the adapter's prompt object.

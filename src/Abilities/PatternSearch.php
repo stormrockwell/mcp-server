@@ -21,8 +21,8 @@ class PatternSearch extends Ability {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function name(): string {
-		return 'mcp-server/pattern-search';
+	protected function slug(): string {
+		return 'pattern-search';
 	}
 
 	/**
@@ -48,19 +48,19 @@ class PatternSearch extends Ability {
 			'properties' => array(
 				'name'     => array(
 					'type'        => 'string',
-					'description' => 'Exact pattern name, for example "core/query-grid-posts".',
+					'description' => __( 'Exact pattern name, for example "core/query-grid-posts".', 'mcp-server' ),
 				),
 				'markup'   => array(
 					'type'        => 'boolean',
-					'description' => 'With "name", also return the block markup. Only needed to change more than the slots.',
+					'description' => __( 'With "name", also return the block markup. Only needed to change more than the slots.', 'mcp-server' ),
 				),
 				'search'   => array(
 					'type'        => 'string',
-					'description' => 'Words to look for in the name, title, and description.',
+					'description' => __( 'Words to look for in the name, title, and description.', 'mcp-server' ),
 				),
 				'category' => array(
 					'type'        => 'string',
-					'description' => 'A pattern category slug such as "posts" or "text".',
+					'description' => __( 'A pattern category slug such as "posts" or "text".', 'mcp-server' ),
 				),
 			),
 		);
@@ -87,7 +87,7 @@ class PatternSearch extends Ability {
 							),
 							'slots'       => array(
 								'type'        => 'array',
-								'description' => 'Only present when "name" was passed. Text slots hold inline HTML, the others hold a URL or plain text.',
+								'description' => __( 'Only present when "name" was passed. Text slots hold inline HTML, the others hold a URL or plain text.', 'mcp-server' ),
 								'items'       => array(
 									'type'       => 'object',
 									'properties' => array(
@@ -100,7 +100,7 @@ class PatternSearch extends Ability {
 							),
 							'content'     => array(
 								'type'        => 'string',
-								'description' => 'Block markup. Only present when "markup" was passed.',
+								'description' => __( 'Block markup. Only present when "markup" was passed.', 'mcp-server' ),
 							),
 						),
 					),

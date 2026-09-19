@@ -22,9 +22,18 @@ use McpServer\Plugin;
 abstract class Ability {
 
 	/**
-	 * Unique name, for example "mcp-server/post-search".
+	 * Name without the namespace, for example "post-search".
 	 */
-	abstract public function name(): string;
+	abstract protected function slug(): string;
+
+	/**
+	 * Unique name, for example "mcp-server/post-search".
+	 *
+	 * The Abilities API rejects a name without a namespace.
+	 */
+	public function name(): string {
+		return Plugin::CATEGORY . '/' . $this->slug();
+	}
 
 	/**
 	 * Short human label.

@@ -19,8 +19,8 @@ class SiteInfo extends Ability {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function name(): string {
-		return 'mcp-server/site-info';
+	protected function slug(): string {
+		return 'site-info';
 	}
 
 	/**

@@ -22,8 +22,8 @@ class PostSave extends Ability {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function name(): string {
-		return 'mcp-server/post-save';
+	protected function slug(): string {
+		return 'post-save';
 	}
 
 	/**
@@ -49,30 +49,30 @@ class PostSave extends Ability {
 			'properties' => array(
 				'id'        => array(
 					'type'        => 'integer',
-					'description' => 'Post to update. Leave out to create.',
+					'description' => __( 'Post to update. Leave out to create.', 'mcp-server' ),
 				),
 				'title'     => array(
 					'type'        => 'string',
-					'description' => 'Required when creating.',
+					'description' => __( 'Required when creating.', 'mcp-server' ),
 				),
 				'content'   => array(
 					'type'        => 'string',
-					'description' => 'Post content as HTML or block markup. To build from patterns, pass "sections" instead.',
+					'description' => __( 'Post content as HTML or block markup. To build from patterns, pass "sections" instead.', 'mcp-server' ),
 				),
 				'sections'  => array(
 					'type'        => 'array',
-					'description' => 'Post content as a list of filled patterns, in place of "content". Replaces all existing content.',
+					'description' => __( 'Post content as a list of filled patterns, in place of "content". Replaces all existing content.', 'mcp-server' ),
 					'items'       => array(
 						'type'       => 'object',
 						'required'   => array( 'pattern' ),
 						'properties' => array(
 							'pattern' => array(
 								'type'        => 'string',
-								'description' => 'A pattern name from pattern-search.',
+								'description' => __( 'A pattern name from pattern-search.', 'mcp-server' ),
 							),
 							'slots'   => array(
 								'type'        => 'array',
-								'description' => 'New values, in the slot order pattern-search returns. Null keeps the sample value, as does leaving values off the end.',
+								'description' => __( 'New values, in the slot order pattern-search returns. Null keeps the sample value, as does leaving values off the end.', 'mcp-server' ),
 								'items'       => array( 'type' => array( 'string', 'null' ) ),
 							),
 						),
@@ -84,7 +84,7 @@ class PostSave extends Ability {
 				),
 				'post_type' => array(
 					'type'        => 'string',
-					'description' => 'Used only when creating. Defaults to "post".',
+					'description' => __( 'Used only when creating. Defaults to "post".', 'mcp-server' ),
 				),
 			),
 		);

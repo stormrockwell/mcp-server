@@ -19,8 +19,8 @@ class SettingGet extends Ability {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function name(): string {
-		return 'mcp-server/setting-get';
+	protected function slug(): string {
+		return 'setting-get';
 	}
 
 	/**
@@ -51,7 +51,7 @@ class SettingGet extends Ability {
 				'names' => array(
 					'type'        => 'array',
 					'items'       => array( 'type' => 'string' ),
-					'description' => 'Setting names to read. Leave out to read them all.',
+					'description' => __( 'Setting names to read. Leave out to read them all.', 'mcp-server' ),
 				),
 			),
 		);
@@ -66,7 +66,7 @@ class SettingGet extends Ability {
 			'properties' => array(
 				'settings' => array(
 					'type'                 => 'object',
-					'description'          => 'Setting values keyed by name.',
+					'description'          => __( 'Setting values keyed by name.', 'mcp-server' ),
 					'additionalProperties' => true,
 				),
 			),

@@ -1,18 +1,5 @@
 {
   "mcpServers": {
-    "default-server": {
-      "command": "php",
-      "args": [
-        "-d",
-        "default_socket_timeout=-1",
-        "/usr/local/bin/wp",
-        "mcp-adapter",
-        "serve",
-        "--server=mcp-adapter-default-server",
-        "--user=admin",
-        "--path=/Users/storm/Studio/mcp-server"
-      ]
-    },
     "mcp-server": {
       "command": "php",
       "args": [
