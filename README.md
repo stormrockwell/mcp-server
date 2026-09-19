@@ -4,17 +4,13 @@ A starter MCP server for WordPress. It turns WordPress abilities into tools an A
 
 ## What is in the box
 
-MCP has three kinds of component. The difference is who decides to use them.
+While the plugin is intended to be extended, we have tools, prompts, and a resource. It also has the philosophy that pages should be built from patterns. 
 
 | Kind | Who decides | In this plugin |
 |---|---|---|
 | Tool | The model | `post-search`, `post-save`, `pattern-search`, `menu-search`, `menu-save`, `setting-get`, `setting-save` |
 | Resource | The client app | `site://info` |
 | Prompt | You, from a menu | `draft-post`, `draft-page` |
-
-Clients see each tool prefixed with `mcp-server-`, for example `mcp-server-post-search`.
-
-Tools and resources are WordPress abilities, registered with `wp_register_ability()`. Prompts are not. A prompt does nothing on the site, it is only a message template, so it uses the adapter's own prompt class.
 
 ## Install
 
@@ -33,8 +29,6 @@ The endpoint is `https://your-site/wp-json/mcp-server/v1/mcp`.
 
 1. In wp-admin, open Users, Profile, and scroll to Application Passwords. Name one, for example `claude`, and click Add. WordPress shows the password once, so copy it now. WP-CLI can do the same: `wp user application-password create admin claude --porcelain`.
 2. Connect as a user who can edit content. See the note on capabilities below.
-
-WordPress only offers application passwords over HTTPS, unless `WP_ENVIRONMENT_TYPE` is `local`.
 
 #### Claude Code
 
@@ -83,7 +77,7 @@ The Claude desktop app reads servers from `claude_desktop_config.json`, under Se
 
 Quit and reopen the app. The tools appear under the tools icon in the message box.
 
-Connectors added on claude.ai, under Settings, Connectors, will not work with an application password. They sign in with OAuth or nothing, cannot send a Basic auth header, and call from Anthropic's servers, so they cannot reach a local site either. Use the desktop app.
+Connectors added on claude.ai, under Settings, Connectors, will not work with an application password. You will need to set up OAuth if you'd like to use connectors.
 
 ### With WP-CLI
 
@@ -98,11 +92,7 @@ Connectors added on claude.ai, under Settings, Connectors, will not work with an
 }
 ```
 
-Use the path from `which wp`. Calling `wp` directly also works, until the client is idle for a minute. Clients hand the server a socket for stdin, PHP gives up reading a socket after `default_socket_timeout`, 60 seconds by default, and the adapter takes that for the client hanging up and exits. The `-d` flag turns the timeout off.
-
-### What the connected user can do
-
-Every tool checks the capabilities of the user you connect as. The floor is being able to edit content: a subscriber gets nothing, not even `site://info`. An author cannot edit an editor's post over MCP any more than in wp-admin.
+Use the path from `which wp`. 
 
 ## Add your own ability
 
@@ -110,33 +100,16 @@ Every tool checks the capabilities of the user you connect as. The floor is bein
 2. Fill in the seven methods: `name`, `label`, `description`, `input_schema`, `output_schema`, `permission`, `execute`. `PostSearch` also overrides `readonly()` to return `true`. Delete that method if your new ability changes anything, or it will ship marked safe to auto approve.
 3. Done. Every class in `src/Abilities/` registers itself and appears as a tool, unless it overrides `type()` to become a resource.
 
-Guidelines that keep tools easy for a model to use:
-
-- Name it noun first: `comment-search`, `comment-save`.
-- One ability to read, one to write. Give `*-save` an optional `id`: with it, update, without it, create.
-- Write schemas out in full and keep the output an object. Avoid `oneOf` and `anyOf`, many clients cannot read them.
-- When two abilities return the same kind of thing, shape it in one place, the way `Format::post()` and `Format::menu()` do for posts and menus.
-- Override `readonly()` to return `true` on tools that change nothing, so clients can skip the confirmation. Resources are read only by nature, so this has no effect there.
-- `permission()` must return `true` or `false` only. WordPress core replaces any failed permission result with one generic error, so a helpful message from `permission()` never reaches the model. Put actionable errors in `execute()` instead, as a `WP_Error` whose message says how to fix the call.
-- To make a resource, override `type()` to return `'resource'` and give it a `uri` in `mcp_meta()`. See `SiteInfo.php`.
-
 To add a prompt, copy `src/Prompts/DraftPost.php`.
 
-## Why two abilities per noun
+## Pages from patterns
 
-Every tool's name, description, and schema is sent to the model on every request. One ability per action (`get`, `list`, `create`, `update`) grows that cost quickly. One ability per noun with an `action` argument keeps it small but forces every field to be optional, and the model starts guessing. Read and write is the middle: create and update share an input, get and list share an output, and reads can still be marked read-only.
+Left alone, a model writes block markup by hand, which is slow, easy to break, and gives a new layout every time. Here it fills patterns instead:
 
-## Uniform posts with patterns
+1. `pattern-search` lists the site's patterns. With a `name`, it returns that pattern's slots: the text, images, and links you can change.
+2. `post-save` takes `sections`, a list of pattern names and slot values, and saves the filled patterns as a draft.
 
-Left alone, a model invents a new layout for every post. A block pattern fixes the layout, so the model only writes the words:
-
-1. `pattern-search` lists the site's patterns. With a `name` it returns that pattern's slots: the text, images, and links it lets you change.
-2. The model writes a new value for each slot.
-3. `post-save` takes `sections`, a list of pattern names and slot values, fills the patterns, and stores the result as a draft.
-
-The model never sees or sends block markup, so it cannot break a block, and a page costs it a fraction of the output. A slot is any block attribute that `block.json` sources from the saved HTML, the same rule block bindings use, so blocks from plugins work without being listed anywhere. `src/PatternSlots.php` does the filling. It borrows a private technique from `WP_Block::replace_html()` until core ships `WP_HTML_Processor::set_inner_html()`, and a test runs every registered pattern through it to catch a core change.
-
-The `draft-post` prompt does all three when you give it a `pattern` argument. `draft-page` always does: a page is a stack of sections, so it takes a list of `patterns`, or picks its own, and saves with `post_type` set to `page`. `pattern-search` has no write twin: patterns come from the theme and from plugins, and the model only reads them.
+The model never sees or sends markup, so it cannot break a block and writes far fewer tokens.
 
 ## Settings are allowlisted
 
@@ -155,7 +128,3 @@ composer lint:fix
 composer test       # Needs the plugin inside a WordPress Studio site, next to the MCP Adapter
 composer package    # Builds dist/mcp-server.zip
 ```
-
-Tests run against a throwaway SQLite database in your temp folder. Your site's data is never touched.
-
-`composer test` needs the plugin at `wp-content/plugins/mcp-server` inside a WordPress install that uses the SQLite drop-in (`wp-content/db.php`), with the MCP Adapter installed alongside it at `wp-content/plugins/mcp-adapter`. A WordPress Studio site already has all of that.
