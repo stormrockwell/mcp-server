@@ -60,7 +60,7 @@ class Server {
 			'mcp-server/v1',
 			'mcp',
 			__( 'MCP Server', 'mcp-server' ),
-			__( 'Posts, pages, patterns, menus, and settings for this WordPress site.', 'mcp-server' ),
+			__( 'Manage posts, pages, patterns, menus, and settings for this WordPress site.', 'mcp-server' ),
 			MCP_SERVER_VERSION,
 			array( HttpTransport::class ),
 			ErrorLogMcpErrorHandler::class,
