@@ -1,0 +1,27 @@
+# The job id must stay "pipeline", because a ruleset requires the checks "pipeline / floor"
+# and "pipeline / risk-gate".
+# The workflow and the CLI are pinned to one dev-pipeline commit so a change upstream cannot alter the floor.
+# enforce-approvals is false because this repo has one developer, and the author never counts as a peer.
+name: Pipeline
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+concurrency:
+  group: pipeline-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  pipeline:
+    uses: stormrockwell/dev-pipeline/.github/workflows/pipeline-pr.yml@97e38f5c83d21ca540479354141daa56f1b189d2
+    with:
+      cli-ref: 97e38f5c83d21ca540479354141daa56f1b189d2
+      php-version: '8.2'
+      enforce-approvals: false

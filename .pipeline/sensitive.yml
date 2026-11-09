@@ -1,0 +1,9 @@
+# The wordpress pack treats request data as $_GET, $_POST and the REST request methods.
+# MCP ability input arrives as $input from an AI client, so a write that sees $input is zone input too.
+packs: [wordpress]
+
+signals:
+  php:
+    - pattern: '\b(update_option|wp_insert_post|wp_update_post|wp_update_nav_menu_item|wp_delete_post)\('
+      zone: input
+      near: '\$input\b'
