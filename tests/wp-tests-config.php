@@ -8,11 +8,12 @@
  * @package McpServer
  */
 
-// Plugin is at wp-content/plugins/mcp-server, so core is four levels up.
-define( 'ABSPATH', dirname( __DIR__, 4 ) . '/' );
+// Core is four levels up from wp-content/plugins/mcp-server. A checkout anywhere else, such as a worktree, names it in WP_CORE_DIR.
+define( 'ABSPATH', rtrim( getenv( 'WP_CORE_DIR' ) ?: dirname( __DIR__, 4 ), '/' ) . '/' );
 
 define( 'DB_ENGINE', 'sqlite' );
-define( 'DB_DIR', sys_get_temp_dir() . '/mcp-server-wp-tests/' );
+// The bootstrap resolves WP_TESTS_DB_DIR, so parallel runs can each keep their own database file.
+define( 'DB_DIR', getenv( 'WP_TESTS_DB_DIR' ) );
 define( 'DB_FILE', '.ht.sqlite' );
 
 // The SQLite driver ignores these, but core expects them to be defined.

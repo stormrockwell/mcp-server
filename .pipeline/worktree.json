@@ -1,0 +1,3 @@
+{
+	"database": { "kind": "sqlite-dir", "dirVar": "WP_TESTS_DB_DIR" }
+}
