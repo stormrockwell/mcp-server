@@ -161,12 +161,9 @@ class MenuSave extends Ability {
 	 * @return true|WP_Error True when the items were replaced, the failing add's error otherwise.
 	 */
 	private function replace_items( int $menu_id, array $items ) {
-		$old_ids = array();
-		$new_ids = array();
-		foreach ( (array) wp_get_nav_menu_items( $menu_id ) as $old_item ) {
-			$old_ids[] = $old_item->ID;
-		}
+		$old_ids = wp_list_pluck( (array) wp_get_nav_menu_items( $menu_id ), 'ID' );
 
+		$new_ids = array();
 		foreach ( array_values( $items ) as $index => $item ) {
 			$added = wp_update_nav_menu_item(
 				$menu_id,

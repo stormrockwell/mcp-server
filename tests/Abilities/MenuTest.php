@@ -85,6 +85,51 @@ final class MenuTest extends TestCase {
 		$this->assertSame( array( 'New' ), wp_list_pluck( $result['menu']['items'], 'title' ) );
 	}
 
+	public function test_save_replaces_several_old_items_in_order(): void {
+		$this->act_as( 'administrator' );
+		$menu_id = wp_create_nav_menu( 'Main' );
+		foreach ( array( 'Old A', 'Old B' ) as $title ) {
+			wp_update_nav_menu_item(
+				$menu_id,
+				0,
+				array(
+					'menu-item-title'  => $title,
+					'menu-item-url'    => 'https://example.org/old',
+					'menu-item-type'   => 'custom',
+					'menu-item-status' => 'publish',
+				)
+			);
+		}
+		$old_ids = wp_list_pluck( wp_get_nav_menu_items( $menu_id ), 'ID' );
+
+		$result = $this->run_ability(
+			'mcp-server/menu-save',
+			array(
+				'id'    => $menu_id,
+				'items' => array(
+					array(
+						'title' => 'New A',
+						'url'   => 'https://example.org/a',
+					),
+					array(
+						'title' => 'New B',
+						'url'   => 'https://example.org/b',
+					),
+					array(
+						'title' => 'New C',
+						'url'   => 'https://example.org/c',
+					),
+				),
+			)
+		);
+
+		$this->assertSame( array( 'New A', 'New B', 'New C' ), wp_list_pluck( $result['menu']['items'], 'title' ) );
+		$this->assertSame( array( 'New A', 'New B', 'New C' ), wp_list_pluck( wp_get_nav_menu_items( $menu_id ), 'title' ) );
+		foreach ( $old_ids as $old_id ) {
+			$this->assertNull( get_post( $old_id ) );
+		}
+	}
+
 	public function test_failed_add_keeps_old_items_and_leaves_no_strays(): void {
 		$this->act_as( 'administrator' );
 		$menu_id = wp_create_nav_menu( 'Main' );
