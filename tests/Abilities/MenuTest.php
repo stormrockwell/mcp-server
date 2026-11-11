@@ -85,6 +85,98 @@ final class MenuTest extends TestCase {
 		$this->assertSame( array( 'New' ), wp_list_pluck( $result['menu']['items'], 'title' ) );
 	}
 
+	public function test_save_replaces_several_old_items_in_order(): void {
+		$this->act_as( 'administrator' );
+		$menu_id = wp_create_nav_menu( 'Main' );
+		foreach ( array( 'Old A', 'Old B' ) as $title ) {
+			wp_update_nav_menu_item(
+				$menu_id,
+				0,
+				array(
+					'menu-item-title'  => $title,
+					'menu-item-url'    => 'https://example.org/old',
+					'menu-item-type'   => 'custom',
+					'menu-item-status' => 'publish',
+				)
+			);
+		}
+		$old_ids = wp_list_pluck( wp_get_nav_menu_items( $menu_id ), 'ID' );
+
+		$result = $this->run_ability(
+			'mcp-server/menu-save',
+			array(
+				'id'    => $menu_id,
+				'items' => array(
+					array(
+						'title' => 'New A',
+						'url'   => 'https://example.org/a',
+					),
+					array(
+						'title' => 'New B',
+						'url'   => 'https://example.org/b',
+					),
+					array(
+						'title' => 'New C',
+						'url'   => 'https://example.org/c',
+					),
+				),
+			)
+		);
+
+		$this->assertSame( array( 'New A', 'New B', 'New C' ), wp_list_pluck( $result['menu']['items'], 'title' ) );
+		$this->assertSame( array( 'New A', 'New B', 'New C' ), wp_list_pluck( wp_get_nav_menu_items( $menu_id ), 'title' ) );
+		foreach ( $old_ids as $old_id ) {
+			$this->assertNull( get_post( $old_id ) );
+		}
+	}
+
+	public function test_failed_add_keeps_old_items_and_leaves_no_strays(): void {
+		$this->act_as( 'administrator' );
+		$menu_id = wp_create_nav_menu( 'Main' );
+		foreach ( array( 'Old A', 'Old B' ) as $title ) {
+			wp_update_nav_menu_item(
+				$menu_id,
+				0,
+				array(
+					'menu-item-title'  => $title,
+					'menu-item-url'    => 'https://example.org/old',
+					'menu-item-type'   => 'custom',
+					'menu-item-status' => 'publish',
+				)
+			);
+		}
+		$old_ids = wp_list_pluck( wp_get_nav_menu_items( $menu_id ), 'ID' );
+
+		$reject_bad = static function ( $maybe_empty, $postarr ) {
+			return 'Bad' === ( $postarr['post_title'] ?? '' ) ? true : $maybe_empty;
+		};
+		add_filter( 'wp_insert_post_empty_content', $reject_bad, 10, 2 );
+
+		$result = $this->run_ability(
+			'mcp-server/menu-save',
+			array(
+				'id'    => $menu_id,
+				'items' => array(
+					array(
+						'title' => 'Good',
+						'url'   => 'https://example.org/good',
+					),
+					array(
+						'title' => 'Bad',
+						'url'   => 'https://example.org/bad',
+					),
+				),
+			)
+		);
+
+		remove_filter( 'wp_insert_post_empty_content', $reject_bad, 10 );
+
+		$this->assertWPError( $result );
+		$remaining = wp_get_nav_menu_items( $menu_id );
+		$this->assertSame( $old_ids, wp_list_pluck( $remaining, 'ID' ) );
+		$this->assertSame( array( 'Old A', 'Old B' ), wp_list_pluck( $remaining, 'title' ) );
+	}
+
 	public function test_update_without_items_keeps_them(): void {
 		$this->act_as( 'administrator' );
 		$menu_id = wp_create_nav_menu( 'Main' );
